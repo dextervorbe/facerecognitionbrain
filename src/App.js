@@ -7,6 +7,7 @@ import "./App.css";
 import ParticlesBg from "particles-bg";
 
 const returnCarifaiRequestOptions = (imageUrl) => {
+  console.log(imageUrl);
   // Your PAT (Personal Access Token) can be found in the portal under Authentification
   const PAT = "cb5edaf03e404443904849e20993f4c8";
   // Specify the correct user_id/app_id pairings
@@ -59,16 +60,14 @@ class App extends Component {
 
   onInputChange = (event) => {
     console.log(event.target.value);
+    this.state.input = event.target.value;
   };
 
   onButtonSubmit = () => {
-    console.log("click");
+    console.log(this.state.input);
     // app.model.predict("face-detection", this.state.input);
     fetch(
-      "https://api.clarifai.com/v2/models/" +
-        "face-detection" +
-        "/versions/" +
-        "/outputs",
+      "https://api.clarifai.com/v2/models/" + "face-detection" + "/outputs",
       returnCarifaiRequestOptions(this.state.input)
     )
       .then((response) => response.json())
