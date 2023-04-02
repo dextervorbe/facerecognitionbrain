@@ -7,7 +7,6 @@ import Rank from "./components/Rank/Rank";
 import "./App.css";
 import ParticlesBg from "particles-bg";
 
-
 const returnCarifaiRequestOptions = (imageUrl) => {
   console.log(imageUrl);
   // Your PAT (Personal Access Token) can be found in the portal under Authentification
@@ -53,36 +52,47 @@ class App extends Component {
     super();
     this.state = {
       input: "",
-      box: {}
+      url: "",
+      box: {},
     };
   }
 
   calculateFaceLocation = (data) => {
-   const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box
+    const clarifaiFace =
+      data.outputs[0].data.regions[0].region_info.bounding_box;
 
+    const image = document.getElementById("inputimage");
+    const width = Number(image.width);
+    const height = Number(image.height);
 
-   console.log(clarifaiFace)
-  }
+    return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - clarifaiFace.right_col * width,
+      bottomRow: height - clarifaiFace.bottom_row * height,
+    };
+  };
 
+  displayFaceBox = (box) => {
+    this.setState({ box });
+    console.log(box);
+  };
 
   onInputChange = (event) => {
-    this.setState({input: event.target.value});
-    console.log(this.state.input)
+    this.setState({ input: event.target.value });
   };
 
   onButtonSubmit = () => {
+    this.setState({ url: this.state.input });
 
     fetch(
       "https://api.clarifai.com/v2/models/" + "face-detection" + "/outputs",
       returnCarifaiRequestOptions(this.state.input)
     )
       .then((response) => response.json())
-      .then((result) => this.calculateFaceLocation(result))
+      .then((result) => this.displayFaceBox(this.calculateFaceLocation(result)))
       .catch((error) => console.log("error", error));
-
-
   };
-
 
   render() {
     return (
@@ -95,7 +105,7 @@ class App extends Component {
           onInputChange={this.onInputChange}
           onButtonSubmit={this.onButtonSubmit}
         />
-        <FaceRecognition onInputChange={this.state.input}/>
+        <FaceRecognition box={this.state.box} onInputChange={this.state.url} />
       </div>
     );
   }
